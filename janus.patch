@@ -1,0 +1,46 @@
+diff --git a/src/auth.c b/src/auth.c
+index 79dfadc..2125e5a 100644
+--- a/src/auth.c
++++ b/src/auth.c
+@@ -197,7 +197,8 @@ gboolean janus_check_param_checksum(json_t *root, const char* request) {
+ 	char field_content[MAX_CHECKSUM_FIELD_SIZE];
+ 	field_content[0] = 0;
+ 
+-	for(int i = 0; i < field_count; i++) {
++        int i;
++	for(i = 0; i < field_count; i++) {
+ 
+ 		json_t* json_field = json_object_get(root, fields[i]);
+ 
+diff --git a/src/log.c b/src/log.c
+index 66d27f1..f4412ec 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -98,7 +98,8 @@ static janus_log_buffer *janus_log_getbuf(void) {
+ }
+ 
+ static void remove_newlines(char* str){
+-	for(int i = 0; str[i] != '\0'; i++){
++	int i;
++	for(i = 0; str[i] != '\0'; i++){
+ 		if(str[i] == '\n'){
+ 			str[i] = ' ';
+ 		}
+diff --git a/src/plugins/janus_videoroom.c b/src/plugins/janus_videoroom.c
+index ebb1358..360d581 100644
+--- a/src/plugins/janus_videoroom.c
++++ b/src/plugins/janus_videoroom.c
+@@ -4389,11 +4389,12 @@ static gboolean isRestricted(char* token) {
+ 
+ 		/* Verify if the token is present */
+ 		if(parts[0]) {
++        		int i;              
+ 
+ 			/* Split the token content */
+ 			data = g_strsplit(parts[0], ",", 0);
+ 
+-			for(int i = 0; data[i]; i++) {
++			for(i = 0; data[i]; i++) {
+ 				/* Let's check if we have the package name */
+ 				if (strstr(data[i], JANUS_VIDEOROOM_PACKAGE)) {
+ 					/* Let's verify if it contains the 'RESTRICTED' keyword */
