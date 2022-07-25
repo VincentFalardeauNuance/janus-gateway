@@ -527,7 +527,8 @@ GList *janus_config_get_arrays(janus_config *config, janus_config_container *par
 
 /* Printing utilities */
 void janus_config_print(janus_config *config) {
-	janus_config_print_as(config, LOG_VERB);
+	//Do not print config
+	//janus_config_print_as(config, LOG_VERB);
 }
 
 #define JANUS_CONFIG_INDENT 4
@@ -559,11 +560,12 @@ static void janus_config_print_list(int level, GList *l, int indent) {
 }
 
 void janus_config_print_as(janus_config *config, int level) {
-	if(config == NULL)
-		return;
-	JANUS_LOG(level, "[%s]\n", config->name ? config->name : "??");
-	if(config->list)
-		janus_config_print_list(level, config->list, JANUS_CONFIG_INDENT);
+	//Do not print config
+	// if(config == NULL)
+	// 	return;
+	// JANUS_LOG(level, "[%s]\n", config->name ? config->name : "??");
+	// if(config->list)
+	// 	janus_config_print_list(level, config->list, JANUS_CONFIG_INDENT);
 }
 
 static void janus_config_save_list(janus_config *config, FILE *file, int level, gboolean array, GList *list, config_setting_t *lcfg) {
