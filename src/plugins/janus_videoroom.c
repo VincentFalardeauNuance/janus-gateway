@@ -4577,7 +4577,6 @@ static json_t *janus_videoroom_process_synchronous_request(janus_videoroom_sessi
 	if(!strcasecmp(request_text, "create")) {
 		/* Create a new VideoRoom */
 		JANUS_LOG(LOG_VERB, "Creating a new VideoRoom room\n");
-
 		JANUS_VALIDATE_JSON_OBJECT(root, create_parameters,
 			error_code, error_cause, TRUE,
 			JANUS_VIDEOROOM_ERROR_MISSING_ELEMENT, JANUS_VIDEOROOM_ERROR_INVALID_ELEMENT);
@@ -4606,7 +4605,6 @@ static json_t *janus_videoroom_process_synchronous_request(janus_videoroom_sessi
 			if(error_code != 0)
 				goto prepare_response;
 		}
-
 		json_t *desc = json_object_get(root, "description");
 		json_t *is_private = json_object_get(root, "is_private");
 		json_t *req_pvtid = json_object_get(root, "require_pvtid");
@@ -4722,12 +4720,7 @@ static json_t *janus_videoroom_process_synchronous_request(janus_videoroom_sessi
 			room_id_str = (char *)json_string_value(room);
 		}
 		if(room_id == 0 && room_id_str == NULL) {
-			//JANUS_LOG(LOG_WARN, "Desired room ID is empty, which is not allowed... picking random ID instead\n");
-			error_code = JANUS_VIDEOROOM_ERROR_UNAUTHORIZED;
-			goto prepare_response;
-		}
-		else {
-			JANUS_LOG(LOG_INFO, "Room name set to %s\n", room_id_str);
+			JANUS_LOG(LOG_WARN, "Desired room ID is empty, which is not allowed... picking random ID instead\n");
 		}
 		janus_mutex_lock(&rooms_mutex);
 		if(room_id > 0 || room_id_str != NULL) {
@@ -5133,7 +5126,6 @@ static json_t *janus_videoroom_process_synchronous_request(janus_videoroom_sessi
 	} else if(!strcasecmp(request_text, "edit")) {
 		/* Edit the properties for an existing VideoRoom */
 		JANUS_LOG(LOG_VERB, "Attempt to edit the properties of an existing VideoRoom room\n");
-
 		if(!string_ids) {
 			JANUS_VALIDATE_JSON_OBJECT(root, room_parameters,
 				error_code, error_cause, TRUE,
@@ -9284,13 +9276,6 @@ static void *janus_videoroom_handler(void *data) {
 				}
 				json_t *display = json_object_get(root, "display");
 				const char *display_text = display ? json_string_value(display) : NULL;
-				if(!display_text) {
-					JANUS_LOG(LOG_ERR, "Missing or invalid participant name (display parameter)\n");
-					error_code = JANUS_VIDEOROOM_ERROR_UNAUTHORIZED;
-					janus_mutex_unlock(&videoroom->mutex);
-					janus_refcount_decrease(&videoroom->ref);
-					goto error;
-				}
 				guint64 user_id = 0;
 				char user_id_num[30], *user_id_str = NULL;
 				gboolean user_id_allocated = FALSE;
@@ -9300,17 +9285,8 @@ static void *janus_videoroom_handler(void *data) {
 						user_id = json_integer_value(id);
 						g_snprintf(user_id_num, sizeof(user_id_num), "%"SCNu64, user_id);
 						user_id_str = user_id_num;
-					}
-					else {
-						// BB
+					} else {
 						user_id_str = (char*)json_string_value(id);
-						if(!user_id_str) {
-							JANUS_LOG(LOG_ERR, "Missing or invalid stream id\n");
-							error_code = JANUS_VIDEOROOM_ERROR_UNAUTHORIZED;
-							janus_mutex_unlock(&videoroom->mutex);
-							janus_refcount_decrease(&videoroom->ref);
-							goto error;
-						}
 					}
 					if(g_hash_table_lookup(videoroom->participants,
 							string_ids ? (gpointer)user_id_str : (gpointer)&user_id) != NULL) {
@@ -9338,14 +9314,6 @@ static void *janus_videoroom_handler(void *data) {
 					}
 					JANUS_LOG(LOG_VERB, "  -- Participant ID: %"SCNu64"\n", user_id);
 				} else {
-					if(!user_id_str) {
-						janus_mutex_unlock(&videoroom->mutex);
-						janus_refcount_decrease(&videoroom->ref);
-						JANUS_LOG(LOG_ERR, "Missing or invalid stream id\n");
-						error_code = JANUS_VIDEOROOM_ERROR_UNAUTHORIZED;
-						goto error;
-					}
-					/* BB - Removed the possibility to generate the id locally (the id parameter is not optional anymore)
 					if(user_id_str == NULL) {
 						// Generate a random ID
 						while(user_id_str == NULL) {
@@ -9358,7 +9326,6 @@ static void *janus_videoroom_handler(void *data) {
 						user_id_allocated = TRUE;
 					}
 					JANUS_LOG(LOG_VERB, "  -- Participant ID: %s\n", user_id_str);
-					*/
 				}
 				/* Process the request */
 				json_t *bitrate = NULL, *record = NULL, *recfile = NULL,
